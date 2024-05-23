@@ -1,3 +1,5 @@
+# Q2 Neg Raising Inferencing Results README
+
 This folder contains the main results for Q2 of the experiment concerning whether the given sentence can be interpreted with the NR interpretation.
 
 #### The contents are:

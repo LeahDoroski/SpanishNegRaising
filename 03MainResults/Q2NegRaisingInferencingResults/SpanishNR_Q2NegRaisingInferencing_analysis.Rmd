@@ -1,0 +1,153 @@
+---
+title: "SpanishNR_Q2NegRaisingInferencing_analysis"
+output: html_document
+date: "2023-12-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Library
+
+```{r}
+library(car)
+library(lme4)
+library(lmerTest)
+library(MuMIn)  # for R2 goodness of fit 
+library(emmeans)
+library(ggeffects) # for post-hoc pairwise comparisons 
+library(glmmTMB)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(ggplot2)
+library(ggsignif)
+library(ggh4x)  # for nested axis labeling
+```
+
+
+# Load in dfs
+
+```{r}
+## Load in Q2 results (no participants were excluded)
+Q2NRInferencingResults_SpanishNR <- read.csv("results-Q2NR_Inferencing-SpanishNR-clean.csv", header=T)
+```
+
+# Investigate the data
+
+## How many counts are there for each group? 
+```{r}
+## By group
+Q2_obs_by_group <- Q2NRInferencingResults_SpanishNR %>%
+  group_by(condition) %>%
+  summarize(n = n())
+
+
+## By participant by group
+Q2_obs_by_participant_group <- Q2NRInferencingResults_SpanishNR %>%
+  group_by(Participant_ID,condition) %>%
+  summarize(n = n())
+```
+
+
+## Find NR reading means
+
+```{r}
+## Find mean NR reading score per condition 
+tapply(as.numeric(Q2NRInferencingResults_SpanishNR$Q2_as_num), 
+       list(Q2NRInferencingResults_SpanishNR$condition), 
+       mean)
+
+## Find mean NR reading score per condition per participant
+tapply(as.numeric(Q2NRInferencingResults_SpanishNR$Q2_as_num),
+       list(Q2NRInferencingResults_SpanishNR$Participant_ID,
+            Q2NRInferencingResults_SpanishNR$condition), 
+       mean)
+```
+
+
+**conditions**   **expected NR reading freq.**  **actual NR reading freq.**
+NR+subj+NPI                  NR                             0.86
+NR+subj                      NR                             0.90
+NNR+subj                   Non-NR                           0.15
+NR+ind+NPI                   NR?                            0.80
+NR+ind                       NR                             0.92
+NNR+ind                    Non-NR                           0.12
+
+
+## Checking that the items are crossed
+```{r}
+table(Q2NRInferencingResults_SpanishNR$item_number,
+      Q2NRInferencingResults_SpanishNR$sentence_type,
+      Q2NRInferencingResults_SpanishNR$mood
+      )
+```
+
+
+# Stats model
+
+## Re-leveling the sentence type factor ordering for the stats base comparisons
+```{r}
+## New base comparison level: NR
+Q2NRInferencingResults_SpanishNR$sentence_type <- relevel(factor(Q2NRInferencingResults_SpanishNR$sentence_type), ref = "NR")
+```
+
+
+## glmer 
+```{r}
+## df: Q2NRInferencingResults_SpanishNR
+## DV: as.factor(Q2_response)
+## IVs: mood:sentence_type (2x3)
+## random effects: Participant_ID, item_number
+
+Q2.glmer=glmer(as.factor(Q2_response)~mood*sentence_type
+               +(1|Participant_ID),    # fails to converge with item as RE
+               data=Q2NRInferencingResults_SpanishNR, family="binomial")
+
+
+## Check whether main effects or interaction is significant
+Anova(Q2.glmer, type = "III")  # There is only a main effect of sentence_type, no interaction, no effect of mood
+```
+
+**Results**: 
+- mood                 0.4114  1     0.5213 NS 
+- sentence_type      249.5049  2     <2e-16 ***
+- mood:sentence_type   2.4624  2     0.2919 NS 
+
+### Removing mood as a non-significant factor 
+```{r}
+## Remove non-significant factors: 
+Q2_sentencetype.glmer=glmer(as.factor(Q2_response)~sentence_type
+                        +(1|Participant_ID),      # still fails to converge with item as RE
+                        data=Q2NRInferencingResults_SpanishNR, family="binomial")
+
+## compare models
+anova(Q2.glmer,Q2_sentencetype.glmer) # not significantly different, so we use the simpler model
+
+## added random slopes
+Q2_sentencetype_RSs.glmer=glmer(as.factor(Q2_response)~sentence_type
+                        +(1+sentence_type|Participant_ID),
+                        data=Q2NRInferencingResults_SpanishNR, family="binomial")  # fails to converge
+```
+
+### results of modeling
+```{r}
+### summarize effect of IV, no direction of the effect
+summary(Q2_sentencetype.glmer)
+
+### estimates for the intercept and slopes of IV
+Anova(Q2_sentencetype.glmer, type = "III")
+
+## R2 - goodness of fit
+r.squaredGLMM(Q2_sentencetype.glmer)
+AIC(Q2.glmer)
+```
+
+**Results**:
+NNR <<<(p<0.001) NR+NPI <(p<0.001) NR
+
+Since there's no interaction, then no subsetting or anything for further inspections 
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

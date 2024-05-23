@@ -1,0 +1,427 @@
+---
+title: "SpanishNR_Q1Acceptability_analysis"
+output: html_document
+date: "2023-12-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Library
+
+```{r}
+library(car)
+library(lme4)
+library(lmerTest)
+library(MuMIn)  # for R2 goodness of fit 
+library(emmeans)
+library(ggeffects) # for post-hoc pairwise comparisons 
+library(glmmTMB)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(ggplot2)
+library(ggsignif)
+library(ggh4x)
+```
+
+# Load in dfs
+
+```{r}
+## Load in Q1 results (no participants were excluded)
+Q1AcceptabilityResults_SpanishNR <- read.csv("results-Q1Acceptability-SpanishNR-clean.csv", header=T)
+```
+
+
+# Investigate the data
+
+## Check that the groups and items are working
+```{r}
+## Check that each participant sees each verb in each condition once 
+table(Q1AcceptabilityResults_SpanishNR$verb, 
+      Q1AcceptabilityResults_SpanishNR$condition, 
+      Q1AcceptabilityResults_SpanishNR$Participant_ID
+      )
+
+
+## Check that each participant sees each NPI type with each verb once 
+table(Q1AcceptabilityResults_SpanishNR$verb, 
+      Q1AcceptabilityResults_SpanishNR$NPI_type, 
+      Q1AcceptabilityResults_SpanishNR$Participant_ID
+      )
+
+
+## Check that each participant sees each item once 
+table(Q1AcceptabilityResults_SpanishNR$item_number, 
+      Q1AcceptabilityResults_SpanishNR$Participant_ID
+      )
+```
+
+Groups and Items are working as expected
+
+
+## Find overall acceptability means 
+
+
+```{r}
+## Find mean acceptability score per condition 
+tapply(as.numeric(Q1AcceptabilityResults_SpanishNR$Value), 
+       list(Q1AcceptabilityResults_SpanishNR$condition), 
+       mean
+       )
+```
+
+*conditions*  *expected grammaticality*  *actual mean grammaticality*
+NR+subj+NPI     grammatical   (6?)                 5.5
+NR+subj         grammatical   (6?)                 6.2
+NNR+subj        grammatical   (6?)                 6.1
+NR+ind+NPI      ungrammatical (2?)                 4.0
+NR+ind          grammatical   (5?)                 5.1
+NNR+ind         grammatical   (6?)                 5.6
+
+
+```{r}
+## Find mean acceptability score per participant per condition 
+tapply(as.numeric(Q1AcceptabilityResults_SpanishNR$Value),
+       list(Q1AcceptabilityResults_SpanishNR$Participant_ID,
+            Q1AcceptabilityResults_SpanishNR$condition
+            ), 
+       mean
+       )
+
+
+## Find mean acceptability score per verb per condition 
+tapply(as.numeric(Q1AcceptabilityResults_SpanishNR$Value),
+       list(Q1AcceptabilityResults_SpanishNR$verb,
+            Q1AcceptabilityResults_SpanishNR$condition
+            ), 
+       mean
+       )
+
+
+## Find mean acceptability score per verb per item 
+tapply(as.numeric(Q1AcceptabilityResults_SpanishNR$Value),
+       list(Q1AcceptabilityResults_SpanishNR$item_number,
+            Q1AcceptabilityResults_SpanishNR$condition
+            ), 
+       mean
+       )
+```
+
+
+
+# Stats modeling
+
+## z-score the 1-7 likert scale responses 
+```{r}
+## z-score the Likert scale values in the df to be modeled 
+Q1_z <- Q1AcceptabilityResults_SpanishNR
+Q1_z$Value <- scale(as.numeric(Q1_z$Value))
+```
+
+
+## lmer 
+```{r}
+## df: Q1_z
+## DV: Value
+## IVs: mood:sentence_type 
+## random effects: Participant_ID, item_number
+
+Q1.lmer=lmer(as.numeric(Value)~mood*sentence_type
+             +(1|Participant_ID)+(1|item_number), 
+                     data=Q1_z)  # converges
+
+Anova(Q1.lmer, type="III")  # everything is significant, nothing removed from model 
+```
+
+### results of modeling 
+```{r}
+### summarize effect of IV, no direction of the effect
+Anova(Q1.lmer, type="III")
+
+### estimates for the intercept and slopes of IV
+summary(Q1.lmer)
+
+## R2 - goodness of fit 
+r.squaredGLMM(Q1.lmer)  # for R2c - percentage of variance of DV explained by model 
+```
+
+**Results** using lme4 version 1.1-26 & lmerTest version 3.1-3: 
+ME: mood                19.0853  1  1.250e-05 ***
+ME: sentence_type      204.7555  2  < 2.2e-16 ***
+I:  mood:sentence_type  40.2132  2  1.853e-09 ***
+
+*Please note that these χ2 results slightly differ from those presented at ELM3*
+
+
+## Additional investigation: see if base model is improved by adding random slopes
+```{r}
+### Added mood and sentence type random slopes
+Q1.RSs.lmer=lmer(as.numeric(Value)~mood*sentence_type
+                 +(1+mood+sentence_type|Participant_ID)
+                 +(1+mood|item_number),
+                       data=Q1_z)       # most complex model that converges 
+
+### compare with anova()
+anova(Q1.lmer,Q1.RSs.lmer)  # Addition of random effects significantly improves model 
+```
+
+### results of modeling with random slopes
+```{r}
+### summarize effect of IV, no direction of the effect
+Anova(Q1.RSs.lmer, type="III")
+
+### estimates for the intercept and slopes of IV
+summary(Q1.RSs.lmer)
+
+## R2 - goodness of fit 
+r.squaredGLMM(Q1.RSs.lmer)  # for R2c - percentage of variance of DV explained by model 
+```
+
+**Results**: Adding random slopes slightly changed results, in that the main effect of mood went from *** to **.
+However, this doesn't change our analysis. 
+
+
+
+## Pairwise comparisons using emmeans() 
+```{r}
+emmeans(Q1.lmer, pairwise ~ mood * sentence_type)
+```
+
+*Comparisons that we care about*:
+- NR+ind vs NR+ind+NPI:        0.6452 0.0661 1632   9.755  <.0001  ***
+- NR+subj vs NR+subj+NPI:      0.4195 0.0667 1635   6.292  <.0001  ***
+- NR+ind+NPI vs NR+subj+NPI:  -0.8787 0.0667 1635 -13.178  <.0001  ***
+- NNR+subj vs NR+subj:        -0.0871 0.0661 1632  -1.317  0.7759  NS
+
+
+## Additional confirmation: Investigating interaction by subsetting
+
+### First, subset by mood
+```{r}
+# First subset by mood
+Q1ind_z <- subset(Q1_z, Q1_z$mood == "ind")
+Q1subj_z <- subset(Q1_z, Q1_z$mood == "subj")
+```
+
+#### Modeling the indicatives
+```{r}
+# Model the IND subset 
+
+## df: Q1ind_z
+## DV: Value
+## IVs: mood:sentence_type 
+## random effects: Participant_ID, item_number
+
+Q1ind.lmer=lmer(as.numeric(Value)~sentence_type
+                +(1|Participant_ID)+(1|item_number), 
+                     data=Q1ind_z)  # converges
+
+Anova(Q1ind.lmer, type="III")  # sentence type is significant 
+
+
+### added random slope
+Q1ind.RSs.lmer=lmer(as.numeric(Value)~sentence_type
+                    +(1+sentence_type|Participant_ID)
+                    +(1+sentence_type|item_number),
+                       data=Q1ind_z)  # most complex model that converges 
+### compared models with anova()
+anova(Q1ind.lmer,Q1ind.RSs.lmer)  # Adding sentence type as random slopes improves model
+```
+
+##### results of modeling 
+```{r}
+### summarize effect of IV, no direction of the effect
+Anova(Q1ind.RSs.lmer, type="III")
+
+### estimates for the intercept and slopes of IV
+summary(Q1ind.RSs.lmer)
+
+## R2 - goodness of fit 
+r.squaredGLMM(Q1ind.RSs.lmer)  # for R2c - percentage of variance of DV explained by model 
+```
+
+**Results**: 
+- sentence_type: 50.7934, p=9.34e-12 (***) 
+NR+NPI << (p<.001) NR < (p=0.0129) NNR
+
+#### Modeling the subjunctives
+```{r}
+# Model the SUBJ subset 
+
+## df: Q1subj_z
+## DV: Value
+## IVs: mood:sentence_type 
+## random effects: Participant_ID, item_number
+
+Q1subj.lmer=lmer(as.numeric(Value)~sentence_type
+                 +(1|Participant_ID)+(1|item_number), 
+                     data=Q1subj_z)  # converges
+
+Anova(Q1subj.lmer, type="III")  # is significant 
+
+
+### added random slopes
+Q1subj.RSs.lmer=lmer(as.numeric(Value)~sentence_type
+                     +(1+sentence_type|Participant_ID)
+                     +(1|item_number),
+                       data=Q1subj_z)  # most complex model that converges 
+
+### compared models with anova()
+anova(Q1subj.lmer,Q1subj.RSs.lmer)  # Adding Sentence type as random slope improves model
+```
+
+##### results of modeling 
+```{r}
+### summarize effect of IV, no direction of the effect
+Anova(Q1subj.RSs.lmer, type="III")
+
+### estimates for the intercept and slopes of IV
+summary(Q1subj.RSs.lmer)
+
+## R2 - goodness of fit 
+r.squaredGLMM(Q1subj.RSs.lmer)  # for R2c - percentage of variance of DV explained by model 
+```
+
+**Results**: 
+- sentence_type: 35.674, p=1.793e-08 (***) 
+NR+NPI << (p<.001) NR = (p=0.139814) NNR
+
+
+### Second, subset by sentence type
+```{r}
+Q1_NNR_z <- subset(Q1_z, Q1_z$sentence_type == "NNR")
+Q1_NR_z <- subset(Q1_z, Q1_z$sentence_type == "NR")
+Q1_NRNPI_z <- subset(Q1_z, Q1_z$sentence_type == "NR+NPI")
+
+```
+
+#### Modeling the non-Neg-raising constructions
+```{r}
+# Model the NNR subset 
+
+## df: Q1_NNR_z
+## DV: Value
+## IVs: mood
+## random effects: Participant_ID, item_number
+
+Q1_NNR.lmer=lmer(as.numeric(Value)~mood
+                 +(1|Participant_ID)+(1|item_number), 
+                     data=Q1_NNR_z)  # converges
+
+Anova(Q1_NNR.lmer, type="III")  # mood is significant 
+
+
+### added random slopes
+Q1_NNR.RSs.lmer=lmer(as.numeric(Value)~mood
+                     +(1+mood|Participant_ID)
+                     +(1+mood|item_number),
+                       data=Q1_NNR_z)  # most complex model that converges 
+
+### compared models with anova()
+anova(Q1_NNR.lmer,Q1_NNR.RSs.lmer)  # adding mood as random slopes improves model
+```
+
+##### results of modeling 
+```{r}
+### summarize effect of IV, no direction of the effect
+Anova(Q1_NNR.RSs.lmer, type="III")
+
+### estimates for the intercept and slopes of IV
+summary(Q1_NNR.RSs.lmer)
+
+## R2 - goodness of fit 
+r.squaredGLMM(Q1_NNR.RSs.lmer)  # for R2c - percentage of variance of DV explained by model 
+```
+
+**Results**: 
+- mood: 5.0116, p=0.02518 (*) 
+IND < (p=0.0299) SUBJ
+
+
+#### Modeling the plain Neg-raising constructions (without NPIs)
+```{r}
+# Model the NR subset 
+
+## df: Q1_NR_z
+## DV: Value
+## IVs: mood
+## random effects: Participant_ID, item_number
+
+Q1_NR.lmer=lmer(as.numeric(Value)~mood
+                +(1|Participant_ID)+(1|item_number), 
+                     data=Q1_NR_z)  # converges
+
+Anova(Q1_NR.lmer, type="III")  # is significant 
+
+
+### added random slopes
+Q1_NR.RSs.lmer=lmer(as.numeric(Value)~mood
+                    +(1+mood|Participant_ID)
+                    +(1|item_number),
+                       data=Q1_NR_z)  # most complex model that converges 
+### compared models with anova()
+anova(Q1_NR.lmer,Q1_NR.RSs.lmer)  # adding mood as random slope improves model
+```
+
+##### results of modeling 
+```{r}
+### summarize effect of IV, no direction of the effect
+Anova(Q1_NR.RSs.lmer, type="III")
+
+### estimates for the intercept and slopes of IV
+summary(Q1_NR.RSs.lmer)
+
+## R2 - goodness of fit 
+r.squaredGLMM(Q1_NR.RSs.lmer)  # for R2c - percentage of variance of DV explained by model 
+```
+
+**Results**: 
+- mood: 42.0391, p=8.947e-11 (***) 
+IND < (p<0.001) SUBJ
+
+
+#### Modeling the Neg-raising constructions with NPIs
+```{r}
+# Model the NR+NPI subset 
+
+## df: Q1_NRNPI_z
+## DV: Value
+## IVs: mood
+## random effects: Participant_ID, item_number
+
+Q1_NRNPI.lmer=lmer(as.numeric(Value)~mood
+                   +(1|Participant_ID)+(1|item_number), 
+                     data=Q1_NRNPI_z)  # converges
+
+Anova(Q1_NRNPI.lmer, type="III")  # is significant 
+
+
+### added random slopes to model
+Q1_NRNPI.RSs.lmer=lmer(as.numeric(Value)~mood
+                       +(1+mood|Participant_ID)+(1+mood|item_number),
+                       data=Q1_NRNPI_z)  # most complex model that converges 
+
+# compare both models with anova()
+anova(Q1_NRNPI.lmer,Q1_NRNPI.RSs.lmer)  # adding mood as random slopes improves model
+```
+
+##### results of modeling 
+```{r}
+### summarize effect of IV, no direction of the effect
+Anova(Q1_NRNPI.RSs.lmer, type="III")
+
+### estimates for the intercept and slopes of IV
+summary(Q1_NRNPI.RSs.lmer)
+
+## R2 - goodness of fit 
+r.squaredGLMM(Q1_NRNPI.RSs.lmer)  # for R2c - percentage of variance of DV explained by model 
+```
+
+
+**Results**: 
+- mood: 49.435, p=2.051e-12 (***) 
+IND < (p<0.001) SUBJ
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

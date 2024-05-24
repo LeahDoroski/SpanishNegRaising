@@ -33,3 +33,5 @@ Here contains a look into the behavior of each of the different predicates used 
 | *recordar* 'remember'                    | 0.11 [0.04, 0.17] |
 
 ![overallNRreading_by_pred_facetwrap_barplots](https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/53d9cb35-269e-40f6-af04-27d617fe78af)
+
+![NRreading_by_pred_facetwrap_barplots](https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/a5b19363-5437-417f-b646-74a49f2de13a)

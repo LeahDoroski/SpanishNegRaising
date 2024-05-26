@@ -13,6 +13,33 @@ Here contains a look into the behavior of each of the different predicates used 
 | *opinar* 'reckon'                        | *asegurar* 'assure'              |
 | *dar la impresión* 'give the impression' | *recordar* 'remember'            |
 
+
+### Mean acceptability by predicate
+
+| Preds                                    | Mean acceptability [95%CI] |
+| :--------------------------------------: | :----------------------------: |
+| **NRPs**                                 |      |
+| *pensar* 'think'                         | 5.2 [4.9, 5.5] |
+| *creer* 'believe'                        | 5.3 [5.1, 5.6] |
+| *considerar* 'consider'                  | 5.2 [5.0, 5.5] |
+| *parecer* 'seem'                         | 5.4 [5.2, 5.6] |
+| *opinar* 'reckon'                        | 4.8 [4.6, 5.1] |
+| *dar la impresión* 'give the impression' | 5.2 [5.0, 5.5] |
+| **Non-NRPs**                             |      |
+| *saber* 'know'                           | 6.0 [5.7, 6.3] |
+| *estar seguro* 'be sure'                 | 5.7 [5.4, 6.0] |
+| *ser consciente* 'be aware'              | 6.1 [5.9, 6.4] |
+| *resultar evidente* 'be evident'         | 5.5 [5.1, 5.8] |
+| *asegurar* 'assure'                      | 5.2 [4.9, 5.6] |
+| *recordar* 'remember'                    | 6.4 [6.2, 6.6] |
+
+#### Boxplots
+
+![OverllAcceptabilitybypred_boxplot](https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/6efe1ef6-3cbe-4f22-8bbc-27e553ccf3b9)
+
+![Acceptabilitybypredbycond_boxplot](https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/10cc6094-e1c4-4446-ad91-c2f14180bac3)
+
+
 ### Mean freq. NR interpretation by predicate
 
 | Preds                                    | Mean freq. NR interpretation [95%CI] |
@@ -32,6 +59,8 @@ Here contains a look into the behavior of each of the different predicates used 
 | *asegurar* 'assure'                      | 0.21 [0.11, 0.30] |
 | *recordar* 'remember'                    | 0.11 [0.04, 0.17] |
 
-![overallNRreading_by_pred_facetwrap_barplots](https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/53d9cb35-269e-40f6-af04-27d617fe78af)
+#### Bar plots
+
+![overallNRreading_by_pred](https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/de22c049-7d61-42a0-8a21-2598c2d675d5)
 
 ![NRreading_by_pred_facetwrap_barplots](https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/a5b19363-5437-417f-b646-74a49f2de13a)

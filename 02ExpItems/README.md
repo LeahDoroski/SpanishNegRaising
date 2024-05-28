@@ -1,7 +1,8 @@
-# Experimental Items README
+# Experimental Items
+
 The experimental items were created by [Raquel Montero Estebaranz](https://github.com/Raquel-Montero). 
 
-### A note on the filler items 
+#### A note on the filler items 
 Only eight of the total 12 filler items are included in the uploaded CSV file. This is because the remaining four filler items are directly coded into [the experiment code](/01ExpCode) as they were used in the implementation of the four attention check trials. More specifically, each attention check trial directly followed a specific trial with a filler item and the attention check trial asked participants a multiple choice question about content of the previous trial. 
 
 For ease of the reader, these additional four filler items which were used for the attention check trials are included here in the following list:

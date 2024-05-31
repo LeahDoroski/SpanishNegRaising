@@ -37,22 +37,23 @@ Here follows a brief comparison of the two NPIs in terms of their overall accept
 
 #### Mean frequency of NR interpretability by strict NPI
 
-| strict NPI | mean freq. NR interpretability |
-| :--------: | :----------------------------: |
-| _en_ N     | 0.85                           |
-| _hasta_    | 0.82                           |
+| strict NPI | mean freq. NR interpretability [95%CI] |
+| :--------: | :------------------------------------: |
+| _en_ N     | 0.85 [0.80, 0.90]                      |
+| _hasta_    | 0.82 [0.77, 0.87]                      |
+
+<img src="https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/df8b5677-e74b-41a9-9ac2-21eaf7b46e5a" width=48%>
 
 
 #### Mean frequency of NR interpretability by strict NPI by mood
 
-| mood | strict NPI | mean freq. NR interpretability |
-| :--: | :--------: | :----------------------------: |
-| SUBJ | _en_ N     | 0.84                           |
-| SUBJ | _hasta_    | 0.87                           |
-| IND  | _en_ N     | 0.87                           |
-| IND  | _hasta_    | 0.74                           |
+| mood | strict NPI | mean freq. NR interpretability [95%CI] |
+| :--: | :--------: | :------------------------------------: |
+| IND  | _en_ N     | 0.87 [0.79, 0.94]                      |
+| IND  | _hasta_    | 0.74 [0.64, 0.84]                      |
+| SUBJ | _en_ N     | 0.84 [0.78, 0.91]                      |
+| SUBJ | _hasta_    | 0.87 [0.81, 0.93]                      |
 
-![NRreading_by_NPI_mood](https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/316b4144-a704-4d95-90ad-c97dc2324fca)
+<img src="https://github.com/LeahDoroski/SpanishNegRaising/assets/138030141/a05efe8f-919e-474e-8437-0f8e9085cdff" width="80%">
 
-
-**Conclusion**:
+**Conclusion**: there does not appear to have been a large difference in NR interpretability between the two NPIs. 

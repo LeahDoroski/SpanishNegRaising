@@ -29,12 +29,12 @@ They provided information on their:
 
 
 ### Education level
-| education level         | num. participants |
-| :---------------------: | :---------------: |
-| Sin estudios /          |  1                |
-| Educación secundaria /  |  5                |
-| Educación universitaria / | 32                |
-| Formación profesional de grado superior / |  10               |
+| education level                                                                 | num. participants |
+| :-----------------------------------------------------------------------------: | :---------------: |
+| Sin estudios / No studies                                                       |  1                |
+| Educación secundaria / High School                                              |  5                |
+| Educación universitaria / Bachelor's                                            | 32                |
+| Formación profesional de grado superior / Advanced specific vocational training | 10                |
 
 
 ### Additional languages

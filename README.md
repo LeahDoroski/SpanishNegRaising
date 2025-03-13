@@ -30,6 +30,7 @@ The experimental code, materials, results, and analyses for the two simultaneous
    Directory containing further investigations into the data
    - comparing the two SUBJ forms: _-ra_ vs _-se_
    - comparing the two strict NPIs: _en_ N vs _hasta_
+   - demographic information of the participants
    - investigating a potential correlation between acceptability and NR inferencing
    - investigating the behavior of each of the predicates used in the experimental items
    - investigating the acceptability of the ungrammatical fillers as a rough comparison

@@ -62,3 +62,22 @@ They provided information on their:
 | Principado de Asturias  |  1                |
 | Región de Murcia        |  4                |
 
+
+### Current region
+| current region          | num. participants |
+| :---------------------: | :---------------: |
+| Andalucía               | 15                |
+| Canarias                |  1                |
+| Cantabria               |  3                |
+| Castilla-La Mancha      |  3                |
+| Castilla y León         |  2                |
+| Cataluña                |  3                |
+| Comunidad de Madrid     | 10                |
+| Comunidad Valenciana    |  1                |
+| Extremadura             |  1                |
+| Galicia                 |  3                |
+| Islas Baleares          |  1                |
+| País Vasco              |  1                |
+| Principado de Asturias  |  1                |
+| Región de Murcia        |  3                |
+
